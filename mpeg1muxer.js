@@ -21,18 +21,22 @@ Mpeg1Muxer = function(options) {
     }
   }
   this.spawnOptions = [
-    "-rtsp_transport",
-    "tcp",
-    "-i",
+    '-rtsp_transport', 'tcp' ,
+    '-i',
     this.url,
-    '-f',
-    'mpegts',
-    '-codec:v',
-    'mpeg1video',
-    // additional ffmpeg options go here
-    ...this.additionalFlags,
+    '-vsync',
+    '0',
+    '-copyts',
+    '-vcodec',
+    'copy',
+    '-movflags', 'frag_keyframe+empty_moov',
+    '-hls_flags', 'delete_segments+append_list',
+    '-f', 'mpegts',
+    '-codec:v', 'mpeg1video', '-s', '640x480', '-b:v', '1000k', '-bf', '0',
+    '-codec:a', 'mp2', '-ar', '44100', '-ac', '1', '-b:a', '128k',
     '-'
   ]
+  
   this.stream = child_process.spawn(options.ffmpegPath, this.spawnOptions, {
     detached: false
   })
