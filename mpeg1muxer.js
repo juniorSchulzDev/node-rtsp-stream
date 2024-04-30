@@ -25,7 +25,7 @@ Mpeg1Muxer = function(options) {
     '-i',
     this.url,
     '-vsync',
-    '0',
+    '1',
     '-copyts',
     '-vcodec',
     'copy',
@@ -33,10 +33,11 @@ Mpeg1Muxer = function(options) {
     '-hls_flags', 'delete_segments+append_list',
     '-f', 'mpegts',
     '-codec:v', 'mpeg1video', '-s', '640x480', '-b:v', '1000k', '-bf', '0',
+    '-r', '30',
     '-codec:a', 'mp2', '-ar', '44100', '-ac', '1', '-b:a', '128k',
     '-'
   ]
-  
+
   this.stream = child_process.spawn(options.ffmpegPath, this.spawnOptions, {
     detached: false
   })
@@ -49,6 +50,7 @@ Mpeg1Muxer = function(options) {
   })
   this.stream.on('exit', (code, signal) => {
     if (code === 1) {
+      cp
       console.error('RTSP stream exited with error')
       this.exitCode = 1
       return this.emit('exitWithError')
