@@ -10,6 +10,12 @@ Mpeg1Muxer = require('./mpeg1muxer')
 
 STREAM_MAGIC_BYTES = "jsmp" // Must be 4 bytes
 
+fs = require('fs')
+
+path  = require('path')
+
+https = require('https')
+
 VideoStream = function(options) {
   this.options = options
   this.name = options.name
@@ -88,27 +94,46 @@ VideoStream.prototype.startMpeg1Stream = function() {
 }
 
 VideoStream.prototype.pipeStreamToSocketServer = function() {
-  this.wsServer = new ws.Server({
-    port: this.wsPort
-  })
-  this.wsServer.on("connection", (socket, request) => {
-    return this.onSocketConnect(socket, request)
-  })
-  this.wsServer.broadcast = function(data, opts) {
-    var results
-    results = []
-    for (let client of this.clients) {
-      if (client.readyState === 1) {
-        results.push(client.send(data, opts))
-      } else {
-        results.push(console.log("Error: Client from remoteAddress " + client.remoteAddress + " not connected."))
+  VideoStream.prototype.pipeStreamToSocketServer = function() {
+    const serverOptions = {
+      cert: fs.readFileSync('/etc/letsencrypt/live/websocket-stream.rotaexata.com.br-0001/fullchain.pem'),
+      key: fs.readFileSync('/etc/letsencrypt/live/websocket-stream.rotaexata.com.br-0001/privkey.pem')
+    };
+    
+    // Cria um servidor HTTPS
+    this.httpsServer = https.createServer(serverOptions);
+  
+    // Cria um WebSocket.Server usando o servidor HTTPS
+    this.wsServer = new ws.Server({
+      server: this.httpsServer
+    });
+  
+    this.wsServer.on("connection", (socket, request) => {
+      return this.onSocketConnect(socket, request);
+    });
+  
+    this.wsServer.broadcast = function(data, opts) {
+      var results;
+      results = [];
+      for (let client of this.clients) {
+        if (client.readyState === 1) {
+          results.push(client.send(data, opts));
+        } else {
+          results.push(console.log("Error: Client from remoteAddress " + client.remoteAddress + " not connected."));
+        }
       }
-    }
-    return results
-  }
-  return this.on('camdata', (data) => {
-    return this.wsServer.broadcast(data)
-  })
+      return results;
+    };
+  
+    this.on('camdata', (data) => {
+      return this.wsServer.broadcast(data);
+    });
+  
+    // Faz o servidor HTTPS escutar na porta especificada
+    this.httpsServer.listen(this.wsPort, () => {
+      console.log(`Servidor WebSocket seguro rodando na porta ${this.wsPort}`);
+    });
+  };
 }
 
 VideoStream.prototype.onSocketConnect = function(socket, request) {
