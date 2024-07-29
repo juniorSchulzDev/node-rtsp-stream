@@ -25,6 +25,7 @@ VideoStream = function(options) {
   this.wsPort = options.wsPort
   this.inputStreamStarted = false
   this.stream = undefined
+  this.httpsServer = undefined
   this.startMpeg1Stream()
   this.pipeStreamToSocketServer()
   return this
@@ -33,8 +34,10 @@ VideoStream = function(options) {
 util.inherits(VideoStream, events.EventEmitter)
 
 VideoStream.prototype.stop = function() {
+  console.log('Derrubando serviços')
   this.wsServer.close()
   this.stream.kill()
+  this.httpsServer.close()
   this.inputStreamStarted = false
   return this
 }
