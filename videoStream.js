@@ -93,7 +93,6 @@ VideoStream.prototype.startMpeg1Stream = function() {
   return this
 }
 
-VideoStream.prototype.pipeStreamToSocketServer = function() {
   VideoStream.prototype.pipeStreamToSocketServer = function() {
     const serverOptions = {
       cert: fs.readFileSync('/etc/letsencrypt/live/websocket-stream.rotaexata.com.br-0001/fullchain.pem'),
@@ -134,7 +133,6 @@ VideoStream.prototype.pipeStreamToSocketServer = function() {
       console.log(`Servidor WebSocket seguro rodando na porta ${this.wsPort}`);
     });
   };
-}
 
 VideoStream.prototype.onSocketConnect = function(socket, request) {
   var streamHeader
