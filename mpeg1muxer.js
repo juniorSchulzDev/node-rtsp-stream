@@ -33,13 +33,14 @@ Mpeg1Muxer = function(options) {
     '-hls_flags', 'delete_segments+append_list',
     '-f', 'mpegts',
     '-codec:v', 'mpeg1video', '-s', '640x480', '-b:v', '1000k', '-bf', '0',
-    '-r', '30',
-    '-'
+    '-r', '30'
   ]
 
   if(options.audioCodec) {
     this.spawnOptions.push('-codec:a', 'mp2', '-ar', '44100', '-ac', '1', '-b:a', '128k')
   }
+
+  this.spawnOptions.push('-')
 
   this.stream = child_process.spawn(options.ffmpegPath, this.spawnOptions, {
     detached: false
