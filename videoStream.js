@@ -23,6 +23,7 @@ VideoStream = function(options) {
   this.width = options.width
   this.height = options.height
   this.wsPort = options.wsPort
+  this.audioCodec = options.audioCodec
   this.inputStreamStarted = false
   this.stream = undefined
   this.httpsServer = undefined
@@ -47,7 +48,8 @@ VideoStream.prototype.startMpeg1Stream = function() {
   this.mpeg1Muxer = new Mpeg1Muxer({
     ffmpegOptions: this.options.ffmpegOptions,
     url: this.streamUrl,
-    ffmpegPath: this.options.ffmpegPath == undefined ? "ffmpeg" : this.options.ffmpegPath
+    ffmpegPath: this.options.ffmpegPath == undefined ? "ffmpeg" : this.options.ffmpegPath,
+    audioCodec: this.audioCodec
   })
   this.stream = this.mpeg1Muxer.stream
   if (this.inputStreamStarted) {

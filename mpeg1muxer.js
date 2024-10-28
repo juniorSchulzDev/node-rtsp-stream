@@ -34,9 +34,12 @@ Mpeg1Muxer = function(options) {
     '-f', 'mpegts',
     '-codec:v', 'mpeg1video', '-s', '640x480', '-b:v', '1000k', '-bf', '0',
     '-r', '30',
-    '-codec:a', 'mp2', '-ar', '44100', '-ac', '1', '-b:a', '128k',
     '-'
   ]
+
+  if(options.audioCodec) {
+    this.spawnOptions.push('-codec:a', 'mp2', '-ar', '44100', '-ac', '1', '-b:a', '128k')
+  }
 
   this.stream = child_process.spawn(options.ffmpegPath, this.spawnOptions, {
     detached: false
